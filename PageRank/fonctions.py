@@ -9,6 +9,9 @@ def create_mini_net_A():
                    [1/2., 0, 1/2., 0]])
     return A
 
+def get_random_x(size):
+    return np.random.randint(size-1, size=size)
+
 def calculateM(A, alpha):
     M = A * (1 - alpha)
     S = np.ones((M.shape[0], M.shape[0]))
@@ -47,13 +50,16 @@ def get_score_vector(M):
     i = np.where(np.abs(v-1) < 1e-5)
     score = w[:, i].reshape((n, 1))
     score /= score.sum()
-    return score.real
+    return np.transpose(score.real) #added transpose
 
 A = create_mini_net_A()
 M = calculateM(A, 0.15)
 gamma = float (1) / M.shape[0]
 mu, beta = get_constants(A, gamma)
 x_etoile = get_score_vector(M)
-
+x_random = get_random_x(M.shape[0])
+print("x*   : " + str(x_etoile))
+print("x    : " + str(x_random))
 print(hessiene(M, gamma))
-print(F(x_etoile, M, gamma))
+print("F(x*):" + str(F(x_etoile, M, gamma)))
+print("F(x) :" + str(F(x_random, M, gamma)))
