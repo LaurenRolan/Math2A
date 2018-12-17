@@ -6,7 +6,7 @@ l'information en 2Ainformatique). Ce fichier doit etre modifié et renommé. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <math.h> //penser à compiler avec l'option -lm 
+#include <math.h> 
 
 #define NB_max 256
 
@@ -143,11 +143,13 @@ int nb_bits(noeud *arbre, int h)
   return nb_bits(arbre->f_gauche, h + 1) + nb_bits(arbre->f_droit, h+1) ;
 }
 
-int nb_bits_new(noeud *arbre, int h)
+/*Retourne le nombre moyen de bits du code*/
+double nb_moyen_bits(noeud *arbre, int h)
 {
   if (arbre -> f_gauche == NULL) 
-	return h * arbre->nb_occurences ;
-  return nb_bits(arbre->f_gauche, h + 1) + nb_bits(arbre->f_droit, h+1) ;
+      return h * arbre->frequence;
+	
+  return (nb_moyen_bits(arbre->f_gauche, h + 1) + nb_moyen_bits(arbre->f_droit, h+1));
 }
 
 
@@ -179,15 +181,15 @@ int main(int argc, char **argv) {
   afficher_table(table, n) ;
 
 // Question 1 : calcul de l'entropie binaire de table
-  for (i = 0; i < n; i++)
-  	entropie += table[i]->frequence * (log(table[i]->frequence) / log(2));
-  	entropie = - entropie;
+    for (i = 0; i < n; i++)
+        entropie += table[i]->frequence * (log(table[i]->frequence) / log(2));
+    entropie = - entropie;
   printf("%.2f\n", entropie);
   /*
   	Question 1
 	Dans un texte petit, on peut dire que les lettres sont quasiment équiprobables
 	comme un texte aléatoire. Dans un grand texte, par contre, les lettres ont une
-	distribuition d'accord la langue qui il est écrit.
+	distribuition d'accord la langue qui il est écrit, et donc, ont probabilités variées.
   */
 
 // Question 2 : construction de l'arbre de Huffman (retourne le noeud *arbre)
@@ -205,7 +207,7 @@ le passage suivant est à décommenter après la question 2 :
 
   /*
 	Question 3
-	On peut vérifier dans l'analyse du fichier "Huffman.txt" qui le lettre
+	On peut vérifier dans l'analyse du fichier "Huffman.txt" qui la lettre
 	plus fréquente est "e", donc, elle est codifiée avec moins bits (seulement 2)
 	qui une lettre moins fréquente (comme la lettre "G", avec 10 bits).
   */
@@ -214,7 +216,7 @@ le passage suivant est à décommenter après la question 2 :
 le passage suivant est à décommenter après la question 3 :
 */
   lc = nb_bits(arbre, 0);
-  printf("longueur (en bits) du texte compresse = %d Sans compression=%d\n", lc, l);
+  printf("longueur (en bits) du texte compresse = %d Sans compression=%d\n", lc, l*8);
   printf("Taxe de compr: %.4f\n", (float) (l*8)/lc );
   /*
 	Question 4
@@ -224,7 +226,14 @@ le passage suivant est à décommenter après la question 3 :
   */
 
 // Question 5 calculer la longueur moyenne du code obtenu :
-
-
+    printf("Longueur moyenne: %.3f.\n", nb_moyen_bits(arbre, 0));
+    
+    /* Question 5
+        L'égalité entre entropie et longueur moyenne dans le fichier "test.txt" s'est produit
+        pour sa haute efficacité (égale à 1, car E = H / l). C'est-à-dire que la longueur de
+        3 bits est idéale pour ce texte. Par contre, le texte "Huffman.txt"
+        présente une eficacité un peu plus basse (0.993). C'est-à-dire que cette codage
+        est moins efficace (il y a plus bits que c'était nécéssaire).
+    */
 return 1 ;
 }
